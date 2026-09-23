@@ -1,0 +1,39 @@
+From: Hospital Management System <donotreply@hms.com>
+To: test@example.com
+Subject: 🏥 Test Email from Hospital Management System
+
+[HTML]
+<html>
+    <body style="font-family: Arial, sans-serif;">
+        <div style="background: #0f172a; color: white; padding: 20px; border-radius: 5px;">
+            <h1>🏥 Test Email</h1>
+            <p>This is a test email from the <strong>Hospital Management System</strong></p>
+            
+            <div style="background: white; color: #0f172a; padding: 15px; margin-top: 20px; border-radius: 5px;">
+                <h3>Test Details:</h3>
+                <ul>
+                    <li>Sender: Hospital Management System (donotreply@hms.com)</li>
+                    <li>Server: localhost:25 (Local MTA)</li>
+                    <li>Status: ✓ Email system working</li>
+                </ul>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                If you received this email, the email system is working correctly!
+            </p>
+        </div>
+    </body>
+</html>
+
+[TEXT]
+This is a test email from the Hospital Management System.
+
+If you received this email, the email system is working correctly!
+
+Test Details:
+- Sender: Hospital Management System (donotreply@hms.com)
+- Server: localhost:25 (Local MTA)
+- Time: Just now
+
+Best regards,
+Hospital Management System

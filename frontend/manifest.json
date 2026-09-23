@@ -1,0 +1,63 @@
+{
+  "name": "Hospital Management System",
+  "short_name": "HMS",
+  "description": "A comprehensive hospital management system for managing doctors, patients, and appointments",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50",
+  "categories": ["healthcare", "medical"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232c3e50' width='192' height='192'/><text x='96' y='120' font-size='80' font-weight='bold' fill='%23fff' text-anchor='middle' font-family='Arial'>HMS</text><path fill='%23f39c12' d='M96 20 L140 50 L140 100 Q96 130 52 100 L52 50 Z'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%232c3e50' width='512' height='512'/><text x='256' y='340' font-size='220' font-weight='bold' fill='%23fff' text-anchor='middle' font-family='Arial'>HMS</text><path fill='%23f39c12' d='M256 50 L380 130 L380 270 Q256 360 132 270 L132 130 Z'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23f5f5f5' width='540' height='720'/><rect fill='%232c3e50' x='0' y='0' width='540' height='60'/><text x='270' y='35' font-size='20' fill='%23fff' text-anchor='middle' font-family='Arial'>Hospital Management System</text><rect fill='%23e8f4f8' x='20' y='80' width='500' height='150' rx='8'/><text x='30' y='110' font-size='14' fill='%23333' font-family='Arial'>Dashboard</text><circle cx='300' cy='180' r='40' fill='%233498db'/><rect fill='%23e8f4f8' x='20' y='250' width='500' height='150' rx='8'/><text x='30' y='280' font-size='14' fill='%23333' font-family='Arial'>Appointments</text><rect fill='%2327ae60' x='50' y='310' width='440' height='60' rx='4' fill-opacity='0.8'/><rect fill='%23e8f4f8' x='20' y='420' width='500' height='200' rx='8'/><text x='30' y='450' font-size='14' fill='%23333' font-family='Arial'>Statistics</text><rect fill='%233498db' x='50' y='480' width='80' height='80' rx='4'/><rect fill='%2327ae60' x='190' y='480' width='80' height='80' rx='4'/><rect fill='%23e74c3c' x='330' y='480' width='80' height='80' rx='4'/></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View My Appointments",
+      "short_name": "Appointments",
+      "description": "View your upcoming appointments",
+      "url": "/?page=appointments",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%233498db' width='96' height='96'/><path fill='%23fff' d='M20 25h56v50H20z' stroke='%23fff' stroke-width='2'/><circle cx='32' cy='35' r='2' fill='%23fff'/><circle cx='64' cy='35' r='2' fill='%23fff'/></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Book an Appointment",
+      "short_name": "Book Now",
+      "description": "Search for doctors and book an appointment",
+      "url": "/?page=departments",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%2327ae60' width='96' height='96'/><path fill='%23fff' d='M48 20 L72 45 L72 75 L24 75 L24 45 Z' stroke='%23fff' stroke-width='2'/></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

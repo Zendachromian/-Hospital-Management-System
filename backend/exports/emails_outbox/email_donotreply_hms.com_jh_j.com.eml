@@ -1,0 +1,70 @@
+From: Hospital Management System <donotreply@hms.com>
+To: jh@j.com
+Subject: 📊 Monthly Activity Report - December 2025
+
+[HTML]
+
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h2 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+                        h3 { color: #34495e; margin-top: 30px; }
+                        .summary { background: #ecf0f1; padding: 20px; border-radius: 5px; margin: 20px 0; }
+                        .summary p { margin: 10px 0; font-size: 16px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { background: #3498db; color: white; padding: 12px; text-align: left; }
+                        td { padding: 10px; border-bottom: 1px solid #ddd; }
+                        .stat { display: inline-block; margin: 10px 20px 10px 0; }
+                        .stat-value { font-size: 32px; font-weight: bold; color: #3498db; }
+                        .stat-label { color: #7f8c8d; font-size: 14px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>📊 Monthly Activity Report - December 2025</h2>
+                    <p>Dear Dr. jh,</p>
+                    <p>Here is your comprehensive activity report for last month.</p>
+                    
+                    <div class="summary">
+                        <h3>📈 Summary Statistics</h3>
+                        <div class="stat">
+                            <div class="stat-value">1</div>
+                            <div class="stat-label">Total Appointments</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">1</div>
+                            <div class="stat-label">Cancelled</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                    
+                    <h3>📋 Treatment Details (Completed Appointments)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient</th>
+                                <th>Diagnosis</th>
+                                <th>Prescription</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="4">No completed treatments</td></tr>
+                        </tbody>
+                    </table>
+                    
+                    <p style="margin-top: 40px; color: #7f8c8d;">
+                        This report was automatically generated on January 08, 2026.<br>
+                        For any questions, please contact the hospital administration.
+                    </p>
+                </body>
+                </html>
+                
+

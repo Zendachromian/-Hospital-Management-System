@@ -1,0 +1,39 @@
+ 
+ -------------- celery@LAPTOP-6SQ2QB6I v5.5.3 (immunity)
+--- ***** ----- 
+-- ******* ---- Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39 2026-09-23 07:44:38
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         backend:0x7c9ab2d73ef0
+- ** ---------- .> transport:   redis://localhost:6379/0
+- ** ---------- .> results:     redis://localhost:6379/0
+- *** --- * --- .> concurrency: 16 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                
+
+[tasks]
+  . backend.celery_tasks.export_patient_treatments
+  . backend.celery_tasks.send_appointment_notification
+  . backend.celery_tasks.send_daily_appointment_reminders
+  . backend.celery_tasks.send_monthly_doctor_reports
+
+[2026-09-23 07:44:39,067: INFO/MainProcess] Connected to redis://localhost:6379/0
+[2026-09-23 07:44:39,070: INFO/MainProcess] mingle: searching for neighbors
+[2026-09-23 07:44:40,080: INFO/MainProcess] mingle: all alone
+[2026-09-23 07:44:40,096: INFO/MainProcess] celery@LAPTOP-6SQ2QB6I ready.
+[2026-09-23 07:44:40,980: INFO/MainProcess] Task backend.celery_tasks.send_daily_appointment_reminders[7458b14a-d94b-4611-b195-b75131d64130] received
+[2026-09-23 07:44:40,983: INFO/MainProcess] Task backend.celery_tasks.send_monthly_doctor_reports[8540c59c-8c60-41b9-acb7-5d6723ab3a0e] received
+[2026-09-23 07:44:41,340: WARNING/ForkPoolWorker-16] ✓ Celery initialized successfully
+[2026-09-23 07:44:41,348: WARNING/ForkPoolWorker-15] ✓ Celery initialized successfully
+[2026-09-23 07:44:41,571: INFO/ForkPoolWorker-15] Task backend.celery_tasks.send_daily_appointment_reminders[7458b14a-d94b-4611-b195-b75131d64130] succeeded in 0.5907631540000011s: 'Sent 0 reminders out of 0 appointments'
+[2026-09-23 07:44:41,577: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr Ashok Singh in August 2026
+[2026-09-23 07:44:41,578: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr Jatin Harshit in August 2026
+[2026-09-23 07:44:41,579: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr Aisha Ahmed in August 2026
+[2026-09-23 07:44:41,580: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr John Smith in August 2026
+[2026-09-23 07:44:41,581: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr Priya Patell in August 2026
+[2026-09-23 07:44:41,583: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. Dr Karim Khan in August 2026
+[2026-09-23 07:44:41,584: WARNING/ForkPoolWorker-16] ⊘ No appointments for Dr. m in August 2026
+[2026-09-23 07:44:41,588: INFO/ForkPoolWorker-16] Task backend.celery_tasks.send_monthly_doctor_reports[8540c59c-8c60-41b9-acb7-5d6723ab3a0e] succeeded in 0.6041242470000725s: 'Sent reports to 0 doctors'

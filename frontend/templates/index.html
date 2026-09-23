@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Hospital Management System - Manage doctors, patients, and appointments efficiently">
+    <meta name="keywords" content="hospital, management, appointments, doctors, patients, healthcare">
+    <meta name="author" content="Hospital Management System">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HMS">
+    <meta name="apple-mobile-web-app-icon" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232c3e50' width='192' height='192'/><text x='96' y='120' font-size='80' font-weight='bold' fill='%23fff' text-anchor='middle' font-family='Arial'>HMS</text><path fill='%23f39c12' d='M96 20 L140 50 L140 100 Q96 130 52 100 L52 50 Z'/></svg>">
+    <meta property="og:title" content="Hospital Management System">
+    <meta property="og:description" content="A comprehensive hospital management system for managing doctors, patients, and appointments">
+    <meta property="og:type" content="website">
+    <meta name="format-detection" content="telephone=no">
+    
+    <title>Hospital Management System</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232c3e50' width='192' height='192'/><text x='96' y='120' font-size='80' font-weight='bold' fill='%23fff' text-anchor='middle' font-family='Arial'>HMS</text><path fill='%23f39c12' d='M96 20 L140 50 L140 100 Q96 130 52 100 L52 50 Z'/></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-light" v-if="currentUser">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-hospital"></i> HMS
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" @click="changePage('dashboard')" href="#">Dashboard</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'admin'">
+                            <a class="nav-link" @click="changePage('doctors')" href="#">Doctors</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'admin'">
+                            <a class="nav-link" @click="changePage('patients')" href="#">Patients</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'admin'">
+                            <a class="nav-link" @click="changePage('appointments')" href="#">Appointments</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'doctor'">
+                            <a class="nav-link" @click="changePage('my-patients')" href="#">My Patients</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'doctor'">
+                            <a class="nav-link" @click="changePage('appointments')" href="#">All Appointments</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'doctor'">
+                            <a class="nav-link" @click="changePage('availability')" href="#">My Availability</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'patient'">
+                            <a class="nav-link" @click="changePage('departments')" href="#">Find Doctors</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'patient'">
+                            <a class="nav-link" @click="changePage('appointments')" href="#">My Appointments</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'patient'">
+                            <a class="nav-link" @click="changePage('history')" href="#">Treatment History</a>
+                        </li>
+                        <li class="nav-item" v-if="currentUser.role === 'patient'">
+                            <a class="nav-link" @click="changePage('payments')" href="#">Payments</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item" v-if="currentUser.role === 'patient' || currentUser.role === 'doctor'">
+                            <a class="nav-link position-relative" @click="checkNotifications" href="#" title="Notifications">
+                                <i class="fas fa-bell"></i>
+                                <span v-if="unreadNotificationCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ unreadNotificationCount }}
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i>{{ currentUser.full_name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" @click="changePage('profile')" href="#"><i class="fas fa-id-card me-2"></i>Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" @click="logout" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Global Alert Messages -->
+        <div v-if="currentUser" class="container mt-3">
+            <div v-if="successMessage" class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <div>{{ successMessage }}</div>
+                <button type="button" class="btn-close" @click="successMessage = ''"></button>
+            </div>
+            <div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <div>{{ errorMessage }}</div>
+                <button type="button" class="btn-close" @click="errorMessage = ''"></button>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <div v-if="!currentUser" class="auth-container">
+                <!-- Animated Background Blobs -->
+                <div class="auth-background">
+                    <div class="blob blob-1"></div>
+                    <div class="blob blob-2"></div>
+                    <div class="blob blob-3"></div>
+                </div>
+                
+                <div class="row justify-content-center w-100">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="card auth-card">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <i class="fas fa-hospital-alt fa-3x text-primary mb-3"></i>
+                                    <h3 class="fw-bold">{{ isLogin ? 'Welcome Back' : 'Create Account' }}</h3>
+                                    <p class="text-muted">{{ isLogin ? 'Sign in to your account' : 'Join our hospital management system' }}</p>
+                                </div>
+                                
+                                <div v-if="errorMessage" class="alert alert-danger d-flex align-items-center" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <div>{{ errorMessage }}</div>
+                                </div>
+                                <div v-if="successMessage" class="alert alert-success d-flex align-items-center" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <div>{{ successMessage }}</div>
+                                </div>
+                                
+                                <form @submit.prevent="isLogin ? login() : register()">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Username</label>
+                                        <input v-model="authForm.username" type="text" class="form-control" placeholder="Enter your username" required>
+                                    </div>
+                                    
+                                    <div v-if="!isLogin" class="mb-3">
+                                        <label class="form-label fw-semibold">Full Name</label>
+                                        <input v-model="authForm.full_name" type="text" class="form-control" placeholder="Enter your full name" required>
+                                    </div>
+                                    
+                                    <div v-if="!isLogin" class="mb-3">
+                                        <label class="form-label fw-semibold">Email</label>
+                                        <input v-model="authForm.email" type="email" class="form-control" placeholder="Enter your email" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Password</label>
+                                        <input v-model="authForm.password" type="password" class="form-control" placeholder="Enter your password" required>
+                                    </div>
+                                    
+                                    <div v-if="!isLogin" class="mb-3">
+                                        <label class="form-label fw-semibold">Phone</label>
+                                        <input v-model="authForm.phone" type="tel" class="form-control" placeholder="Enter your phone number">
+                                    </div>
+                                    
+                                    <div v-if="!isLogin" class="mb-3">
+                                        <label class="form-label fw-semibold">Date of Birth</label>
+                                        <input v-model="authForm.date_of_birth" type="date" class="form-control">
+                                    </div>
+                                    
+                                    <div v-if="!isLogin" class="mb-3">
+                                        <label class="form-label fw-semibold">Gender</label>
+                                        <select v-model="authForm.gender" class="form-select">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" :disabled="isLoggingIn || isRegistering">
+                                        <span v-if="isLoggingIn || isRegistering" class="loading-spinner me-2"></span>
+                                        {{ isLogin ? (isLoggingIn ? 'Signing In...' : 'Sign In') : (isRegistering ? 'Creating Account...' : 'Create Account') }}
+                                    </button>
+                                </form>
+                                
+                                <div class="text-center mt-4">
+                                    <p class="text-muted">
+                                        {{ isLogin ? "Don't have an account?" : "Already have an account?" }}
+                                        <a href="#" @click="toggleAuthMode" class="auth-toggle fw-semibold">
+                                            {{ isLogin ? 'Create one' : 'Sign in' }}
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else>
+                <!-- Rest of the application content remains exactly the same -->
+                <div v-if="currentPage === 'dashboard'">
+                    <div v-if="currentUser.role === 'admin'" class="admin-dashboard">
+                        <h2>Admin Dashboard</h2>
+                        
+                        <!-- Summary Cards -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-3">
+                                <div class="card text-white bg-primary">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="card-title mb-1">Total Doctors</h5>
+                                                <h2 class="mb-0">{{ dashboardStats.total_doctors || 0 }}</h2>
+                                            </div>
+                                            <i class="fas fa-user-md fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-success">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="card-title mb-1">Total Patients</h5>
+                                                <h2 class="mb-0">{{ dashboardStats.total_patients || 0 }}</h2>
+                                            </div>
+                                            <i class="fas fa-users fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-info">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="card-title mb-1">Total Appointments</h5>
+                                                <h2 class="mb-0">{{ dashboardStats.total_appointments || 0 }}</h2>
+                                            </div>
+                                            <i class="fas fa-calendar-check fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-white bg-warning">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="card-title mb-1">Upcoming</h5>
+                                                <h2 class="mb-0">{{ dashboardStats.upcoming_appointments || 0 }}</h2>
+                                            </div>
+                                            <i class="fas fa-clock fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Charts Row -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-chart-pie text-primary"></i> Appointments by Status</h5>
+                                        <canvas id="appointmentStatusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-chart-bar text-success"></i> Appointments by Department</h5>
+                                        <canvas id="departmentChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-chart-line text-info"></i> Appointments Trend (Last 7 Days)</h5>
+                                        <canvas id="appointmentTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-chart-doughnut text-warning"></i> Patient Gender Distribution</h5>
+                                        <canvas id="genderChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Charts Row -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-star text-success"></i> Top Doctors by Appointments</h5>
+                                        <canvas id="topDoctorsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-chart-bar text-info"></i> Appointment Status Rate</h5>
+                                        <canvas id="completionRateChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-clock text-primary"></i> Peak Appointment Times</h5>
+                                        <canvas id="peakTimesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-hospital text-danger"></i> Busiest Departments</h5>
+                                        <canvas id="departmentLoadChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Appointments Table -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-list text-primary"></i> Recent Appointments</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Patient ID</th>
+                                                <th>Patient</th>
+                                                <th>Doctor ID</th>
+                                                <th>Doctor</th>
+                                                <th>Department</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="apt in appointments.slice(0, 10)" :key="apt.id">
+                                                <td>{{ apt.appointment_date }}</td>
+                                                <td>{{ apt.appointment_time }}</td>
+                                                <td><span class="badge bg-info">{{ apt.patient_id }}</span></td>
+                                                <td>{{ apt.patient_name }}</td>
+                                                <td><span class="badge bg-primary">{{ apt.doctor_id }}</span></td>
+                                                <td>{{ apt.doctor_name }}</td>
+                                                <td>{{ apt.department }}</td>
+                                                <td><span class="badge" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentUser.role === 'doctor'" class="doctor-dashboard">
+                        <h2>Doctor Dashboard</h2>
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <div class="card text-white bg-primary">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Today's Appointments</h5>
+                                        <h2>{{ doctorStats.today_appointments ? doctorStats.today_appointments.length : 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-white bg-success">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Upcoming This Week</h5>
+                                        <h2>{{ doctorStats.upcoming_appointments ? doctorStats.upcoming_appointments.length : 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-white bg-info">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Total Patients</h5>
+                                        <h2>{{ doctorStats.total_patients || 0 }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Today's Appointments</h5>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Patient</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="apt in doctorStats.today_appointments" :key="apt.id">
+                                                <td>{{ apt.appointment_time }}</td>
+                                                <td>{{ apt.patient_name }}</td>
+                                                <td>{{ apt.reason || 'N/A' }}</td>
+                                                <td><span class="badge" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</span></td>
+                                                <td>
+                                                    <button v-if="apt.status === 'Booked'" @click="openTreatmentModal(apt)" class="btn btn-sm btn-success me-1">Complete</button>
+                                                    <button v-if="apt.status === 'Booked'" @click="cancelAppointmentDoctor(apt.id)" class="btn btn-sm btn-danger">Cancel</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentUser.role === 'patient'" class="patient-dashboard">
+                        <h2>Patient Dashboard</h2>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Upcoming Appointments</h5>
+                                <div v-if="patientStats.upcoming_appointments && patientStats.upcoming_appointments.length > 0">
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Doctor</th>
+                                                    <th>Department</th>
+                                                    <th>Status</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="apt in patientStats.upcoming_appointments" :key="apt.id">
+                                                    <td>{{ apt.appointment_date }}</td>
+                                                    <td>{{ apt.appointment_time }}</td>
+                                                    <td>{{ apt.doctor_name }}</td>
+                                                    <td>{{ apt.department }}</td>
+                                                    <td><span class="badge" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</span></td>
+                                                    <td>
+                                                        <button @click="cancelAppointmentById(apt.id)" class="btn btn-sm btn-danger">Cancel</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div v-else class="text-muted">No upcoming appointments</div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Doctor Availability (Next 7 Days)</h5>
+                                <div v-if="doctorsAvailability && doctorsAvailability.length > 0" class="row g-2">
+                                    <div v-for="doctor in doctorsAvailability.slice(0, 6)" :key="doctor.id" class="col-md-6">
+                                        <div class="card border-primary h-100">
+                                            <div class="card-body p-3">
+                                                <h6 class="card-title mb-2">Dr. {{ doctor.full_name }}</h6>
+                                                <p class="small text-muted mb-2">{{ doctor.specialization }} - {{ doctor.department_name }}</p>
+                                                <div v-if="doctor.availability && doctor.availability.length > 0">
+                                                    <p class="small mb-1"><strong>Available on:</strong></p>
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        <span v-for="avail in doctor.availability" :key="avail.id" 
+                                                              :class="avail.is_available ? 'badge bg-success' : 'badge bg-secondary'"
+                                                              :title="`${avail.date}: ${avail.start_time} - ${avail.end_time}`">
+                                                            {{ new Date(avail.date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div v-else class="text-muted small">No availability set</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="text-muted">Loading availability...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Departments</h5>
+                                <div class="row g-3">
+                                    <div v-for="dept in departments" :key="dept.id" class="col-md-4">
+                                        <div class="card h-100 cursor-pointer" @click="viewDepartmentDoctors(dept)">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ dept.name }}</h6>
+                                                <p class="card-text text-muted small">{{ dept.description }}</p>
+                                                <p class="text-primary"><strong>{{ dept.doctors_count }} doctors</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="currentPage === 'doctors'">
+                    <h2>Manage Doctors</h2>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div>
+                            <button @click="showAddDoctorModal = true" class="btn btn-primary">Add Doctor</button>
+                            <button @click="toggleInactiveDoctors" class="btn btn-outline-secondary ms-2">
+                                <i class="fas" :class="showInactiveDoctors ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                {{ showInactiveDoctors ? 'Hide Inactive' : 'Show All' }}
+                            </button>
+                        </div>
+                        <div class="input-group" style="max-width: 400px;">
+                            <input v-model="doctorSearchQuery" @input="searchDoctors" type="text" class="form-control" placeholder="Search by name, ID, or specialization...">
+                            <button v-if="doctorSearchQuery" @click="doctorSearchQuery = ''; loadDoctors()" class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Doctor ID</th>
+                                            <th>Name</th>
+                                            <th>Department</th>
+                                            <th>Specialization</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="doctor in doctors" :key="doctor.id" :class="{'table-secondary': !doctor.is_active}">
+                                            <td><span class="badge bg-primary">{{ doctor.id }}</span></td>
+                                            <td>
+                                                {{ doctor.full_name }}
+                                                <span v-if="!doctor.is_active" class="badge bg-danger ms-2">Inactive</span>
+                                            </td>
+                                            <td>{{ doctor.department_name }}</td>
+                                            <td>{{ doctor.specialization }}</td>
+                                            <td>{{ doctor.phone }}</td>
+                                            <td>
+                                                <a :href="`mailto:${doctor.email}`" class="text-decoration-none">
+                                                    <i class="fas fa-envelope me-1"></i>{{ doctor.email }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <button v-if="doctor.is_active" @click="editDoctor(doctor)" class="btn btn-sm btn-warning">Edit</button>
+                                                <button v-if="doctor.is_active" @click="deleteDoctor(doctor.id)" class="btn btn-sm btn-danger ms-2">Deactivate</button>
+                                                <button v-if="!doctor.is_active" @click="reactivateDoctor(doctor.id)" class="btn btn-sm btn-success">Reactivate</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="currentPage === 'patients'">
+                    <h2>Manage Patients</h2>
+                    <div class="d-flex justify-content-between mb-3">
+                        <button @click="toggleInactivePatients" class="btn btn-outline-secondary">
+                            <i class="fas" :class="showInactivePatients ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            {{ showInactivePatients ? 'Hide Inactive' : 'Show All' }}
+                        </button>
+                        <div class="input-group" style="max-width: 400px;">
+                            <input v-model="patientSearchQuery" @input="searchPatients" type="text" class="form-control" placeholder="Search by name, ID, phone, or email...">
+                            <button v-if="patientSearchQuery" @click="patientSearchQuery = ''; loadPatients()" class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Blood Group</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="patient in patients" :key="patient.id" :class="{'table-secondary': !patient.is_active}">
+                                            <td><span class="badge bg-info">{{ patient.id }}</span></td>
+                                            <td>
+                                                {{ patient.full_name }}
+                                                <span v-if="!patient.is_active" class="badge bg-danger ms-2">Inactive</span>
+                                            </td>
+                                            <td>{{ patient.email }}</td>
+                                            <td>{{ patient.phone }}</td>
+                                            <td>{{ patient.blood_group || 'N/A' }}</td>
+                                            <td>
+                                                <button v-if="patient.is_active" @click="deletePatient(patient.id)" class="btn btn-sm btn-danger">Deactivate</button>
+                                                <button v-if="!patient.is_active" @click="reactivatePatient(patient.id)" class="btn btn-sm btn-success">Reactivate</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="currentPage === 'departments'">
+                    <h2>Find Doctors</h2>
+                    
+                    <div class="mb-3">
+                        <div class="input-group" style="max-width: 500px;">
+                            <input v-model="doctorFinderSearchQuery" @input="searchDoctorsByName" type="text" class="form-control" placeholder="Search doctors by name or specialization...">
+                            <button v-if="doctorFinderSearchQuery" @click="doctorFinderSearchQuery = ''; loadDepartmentDoctors()" class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button @click="searchDoctorsByName" class="btn btn-primary" type="button">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div v-for="dept in departments" :key="dept.id" class="col-md-4">
+                            <div class="card h-100 cursor-pointer" @click="viewDepartmentDoctors(dept)">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ dept.name }}</h5>
+                                    <p class="card-text">{{ dept.description }}</p>
+                                    <p class="text-primary"><strong>{{ dept.doctors_count }} doctors available</strong></p>
+                                    <button class="btn btn-primary btn-sm">View Doctors</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="currentPage === 'appointments'">
+                    <h2>{{ currentUser.role === 'doctor' ? 'All Appointments' : currentUser.role === 'admin' ? 'All Appointments' : 'My Appointments' }}</h2>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th v-if="currentUser.role === 'doctor'">Patient ID</th>
+                                            <th v-else>Doctor ID</th>
+                                            <th v-if="currentUser.role === 'doctor'">Patient</th>
+                                            <th v-else-if="currentUser.role === 'admin'">Patient</th>
+                                            <th v-else>Doctor</th>
+                                            <th>Department</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="apt in appointments" :key="apt.id">
+                                            <td>{{ apt.appointment_date }}</td>
+                                            <td>{{ apt.appointment_time }}</td>
+                                            <td v-if="currentUser.role === 'doctor'"><span class="badge bg-info">{{ apt.patient_id }}</span></td>
+                                            <td v-else><span class="badge bg-primary">{{ apt.doctor_id }}</span></td>
+                                            <td v-if="currentUser.role === 'doctor'">{{ apt.patient_name }}</td>
+                                            <td v-else-if="currentUser.role === 'admin'">{{ apt.patient_name }}</td>
+                                            <td v-else>{{ apt.doctor_name }}</td>
+                                            <td>{{ apt.department }}</td>
+                                            <td><span class="badge" :class="getStatusBadgeClass(apt.status)">{{ apt.status }}</span></td>
+                                            <td>
+                                                <!-- Patient actions -->
+                                                <button v-if="currentUser.role === 'patient' && apt.status === 'Booked'" @click="editAppointment(apt)" class="btn btn-sm btn-warning me-1">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button v-if="currentUser.role === 'patient' && apt.status === 'Booked'" @click="cancelAppointmentById(apt.id)" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                                <button v-if="currentUser.role === 'patient' && apt.has_treatment" @click="viewTreatment(apt)" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> View Treatment
+                                                </button>
+                                                
+                                                <!-- Doctor actions -->
+                                                <button v-if="currentUser.role === 'doctor' && apt.status === 'Booked'" @click="openTreatmentModal(apt)" class="btn btn-sm btn-success me-1">
+                                                    <i class="fas fa-check"></i> Complete
+                                                </button>
+                                                <button v-if="currentUser.role === 'doctor' && apt.status === 'Booked'" @click="cancelAppointmentDoctor(apt.id)" class="btn btn-sm btn-danger me-1">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                                <button v-if="currentUser.role === 'doctor' && apt.status === 'Completed' && apt.has_treatment" @click="viewTreatment(apt)" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> View Treatment
+                                                </button>
+                                                
+                                                <!-- Admin actions -->
+                                                <button v-if="currentUser.role === 'admin'" @click="sendAppointmentEmail(apt.id)" class="btn btn-sm btn-info me-1">
+                                                    <i class="fas fa-envelope"></i> Send Email
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="currentPage === 'history'">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-history me-2"></i>Treatment History</h2>
+                        <button @click="exportTreatments" class="btn btn-success">
+                            <i class="fas fa-download me-2"></i>Export to CSV
+                        </button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div v-if="treatmentHistory.length === 0" class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No treatment history found. Your completed appointment details will appear here.
+                            </div>
+                            
+                            <div v-else class="table-responsive">
+                                <table class="table table-hover table-striped">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date & Time</th>
+                                            <th>Doctor</th>
+                                            <th>Department</th>
+                                            <th>Diagnosis</th>
+                                            <th>Prescription</th>
+                                            <th>Notes</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="record in treatmentHistory" :key="record.id">
+                                            <td>
+                                                <small>{{ new Date(record.appointment_date).toLocaleDateString() }}</small><br>
+                                                <small class="text-muted" v-if="record.appointment_time">{{ record.appointment_time }}</small>
+                                            </td>
+                                            <td><strong>{{ record.doctor_name }}</strong></td>
+                                            <td>{{ record.department_name || 'N/A' }}</td>
+                                            <td v-if="record.treatment">
+                                                <span class="badge bg-info">{{ record.treatment.diagnosis }}</span>
+                                            </td>
+                                            <td v-else>-</td>
+                                            <td v-if="record.treatment">
+                                                <small>{{ record.treatment.prescription || 'N/A' }}</small>
+                                            </td>
+                                            <td v-else>-</td>
+                                            <td v-if="record.treatment">
+                                                <small>{{ record.treatment.notes || '-' }}</small>
+                                            </td>
+                                            <td v-else>-</td>
+                                            <td>
+                                                <span class="badge bg-success">{{ record.status }}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Doctor Availability Page -->
+                <div v-if="currentPage === 'availability' && currentUser.role === 'doctor'">
+                    <h2><i class="fas fa-calendar-alt me-2"></i>My Availability (Next 7 Days)</h2>
+                    <p class="text-muted">Set your availability for the next 7 days</p>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <form @submit.prevent="saveAvailability">
+                                <div v-for="(day, index) in availabilityDays" :key="index" class="mb-4 pb-3 border-bottom">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2">
+                                            <strong>{{ day.dayName }}</strong><br>
+                                            <small class="text-muted">{{ day.date }}</small>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Start Time</label>
+                                            <input v-model="day.start_time" type="time" class="form-control" :disabled="!day.is_available">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">End Time</label>
+                                            <input v-model="day.end_time" type="time" class="form-control" :disabled="!day.is_available">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-check form-switch">
+                                                <input v-model="day.is_available" class="form-check-input" type="checkbox" :id="'available-' + index">
+                                                <label class="form-check-label" :for="'available-' + index">
+                                                    {{ day.is_available ? 'Available' : 'Not Available' }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary" :disabled="isLoading">
+                                        <i class="fas fa-save me-2"></i>{{ isLoading ? 'Saving...' : 'Save Availability' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div v-if="currentPage === 'profile'">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>My Profile</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div v-if="successMessage" class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+                                    </div>
+                                    <div v-if="errorMessage" class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+                                    </div>
+
+                                    <form @submit.prevent="updateProfile">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Username</label>
+                                                <input type="text" class="form-control" :value="currentUser.username" disabled>
+                                                <small class="text-muted">Username cannot be changed</small>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Role</label>
+                                                <input type="text" class="form-control text-capitalize" :value="currentUser.role" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Full Name *</label>
+                                                <input v-model="profileForm.full_name" type="text" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Email *</label>
+                                                <input v-model="profileForm.email" type="email" class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Phone</label>
+                                                <input v-model="profileForm.phone" type="tel" class="form-control">
+                                            </div>
+                                            <div class="col-md-6 mb-3" v-if="currentUser.role === 'patient'">
+                                                <label class="form-label fw-semibold">Date of Birth</label>
+                                                <input v-model="profileForm.date_of_birth" type="date" class="form-control">
+                                            </div>
+                                            <div class="col-md-6 mb-3" v-if="currentUser.role === 'doctor'">
+                                                <label class="form-label fw-semibold">Department</label>
+                                                <input type="text" class="form-control" :value="currentUser.department_name" disabled>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row" v-if="currentUser.role === 'doctor'">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Specialization</label>
+                                                <input type="text" class="form-control" :value="currentUser.specialization" disabled>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Qualification</label>
+                                                <input type="text" class="form-control" :value="currentUser.qualification" disabled>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row" v-if="currentUser.role === 'doctor'">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Experience</label>
+                                                <input type="text" class="form-control" :value="`${currentUser.experience_years} years`" disabled>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Consultation Fee</label>
+                                                <input type="text" class="form-control" :value="`$${currentUser.consultation_fee}`" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" v-if="currentUser.role === 'patient'">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Gender</label>
+                                                <select v-model="profileForm.gender" class="form-select">
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Blood Group</label>
+                                                <input v-model="profileForm.blood_group" type="text" class="form-control" placeholder="e.g., A+, O-, B+">
+                                            </div>
+                                        </div>
+
+                                        <div class="row" v-if="currentUser.role === 'patient'">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Address</label>
+                                                <textarea v-model="profileForm.address" class="form-control" rows="2"></textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label fw-semibold">Emergency Contact</label>
+                                                <input v-model="profileForm.emergency_contact" type="tel" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <button type="button" @click="changePage('dashboard')" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                            </button>
+                                            <button type="submit" class="btn btn-primary" :disabled="isLoading">
+                                                <i class="fas fa-save me-2"></i>{{ isLoading ? 'Saving...' : 'Save Changes' }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                    
+                                    <!-- Treatment History Section for Patients -->
+                                    <div v-if="currentUser.role === 'patient'" class="mt-5 pt-4 border-top">
+                                        <h4 class="mb-3"><i class="fas fa-history me-2"></i>Treatment History</h4>
+                                        
+                                        <div v-if="patientHistory.length === 0" class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>No completed treatments yet.
+                                        </div>
+                                        
+                                        <div v-else class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Doctor</th>
+                                                        <th>Department</th>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                        <th>Details</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="record in patientHistory" :key="record.id">
+                                                        <td><strong>{{ record.doctor_name }}</strong></td>
+                                                        <td>{{ record.department_name || 'N/A' }}</td>
+                                                        <td>{{ new Date(record.appointment_date).toLocaleDateString() }}</td>
+                                                        <td>
+                                                            <span class="badge bg-success">{{ record.status }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <button v-if="record.treatment" @click="viewTreatmentDetails(record.treatment)" class="btn btn-sm btn-info">
+                                                                <i class="fas fa-eye me-1"></i>View
+                                                            </button>
+                                                            <span v-else class="text-muted">-</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments Page (Patient) -->
+                <div v-if="currentPage === 'payments' && currentUser.role === 'patient'">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h2><i class="fas fa-credit-card me-2"></i>Make Payment</h2>
+                            <p class="text-muted">Pay for your completed treatments</p>
+                            
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Pending Payments</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div v-if="pendingPayments.length === 0" class="alert alert-info">
+                                        <i class="fas fa-check-circle me-2"></i>No pending payments.
+                                    </div>
+                                    
+                                    <div v-else class="list-group">
+                                        <div v-for="apt in pendingPayments" :key="apt.id" class="list-group-item p-3">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-6">
+                                                    <h6 class="mb-1">{{ apt.doctor_name }}</h6>
+                                                    <small class="text-muted">{{ apt.department }}</small><br>
+                                                    <small>{{ new Date(apt.appointment_date).toLocaleDateString() }} at {{ apt.appointment_time }}</small>
+                                                    <p class="mb-0 mt-2"><strong>Diagnosis:</strong> {{ apt.diagnosis }}</p>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <h5 class="text-primary">₹{{ apt.consultation_fee }}</h5>
+                                                    <small class="text-muted">Consultation Fee</small>
+                                                </div>
+                                                <div class="col-md-3 text-end">
+                                                    <button @click="openPaymentModal(apt)" class="btn btn-primary">
+                                                        <i class="fas fa-payment me-1"></i>Pay Now
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h5>Payment History</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div v-if="paymentHistory.length === 0" class="alert alert-info alert-sm">
+                                        <small>No payments yet</small>
+                                    </div>
+                                    <div v-else class="list-group list-group-sm">
+                                        <div v-for="payment in paymentHistory.slice(0, 5)" :key="payment.id" class="list-group-item p-2">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <small><strong>{{ payment.doctor_name }}</strong></small><br>
+                                                    <small class="text-muted">{{ new Date(payment.created_at).toLocaleDateString() }}</small>
+                                                </div>
+                                                <span class="badge bg-success">₹{{ payment.amount }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Modal -->
+                <div v-if="showPaymentModal" class="modal d-block" style="background-color: rgba(0,0,0,0.5);">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">💳 Payment Portal</h5>
+                                <button type="button" class="btn-close btn-close-white" @click="showPaymentModal = false"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div v-if="selectedPaymentApt" class="mb-3">
+                                    <p><strong>Doctor:</strong> {{ selectedPaymentApt.doctor_name }}</p>
+                                    <p><strong>Amount:</strong> <span class="text-primary">₹{{ selectedPaymentApt.consultation_fee }}</span></p>
+                                </div>
+                                
+                                <form @submit.prevent="submitPayment">
+                                    <div class="mb-3">
+                                        <label class="form-label">Cardholder Name *</label>
+                                        <input v-model="paymentForm.card_holder_name" type="text" class="form-control" placeholder="Full Name" 
+                                            pattern="[A-Za-z\s]{2,50}" title="Name must contain only letters and spaces (2-50 characters)"
+                                            maxlength="50" required autocomplete="cc-name">
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fas fa-info-circle me-1"></i>Letters and spaces only, 2-50 characters (e.g., John Smith)
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Card Number *</label>
+                                        <input v-model="paymentForm.card_number" type="text" class="form-control" placeholder="1234567890123456" 
+                                            pattern="[0-9]{16}" title="Card number must be exactly 16 digits"
+                                            maxlength="16" inputmode="numeric" required autocomplete="cc-number">
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="fas fa-info-circle me-1"></i>16 digits only, no spaces (e.g., 4532015112830366)
+                                        </small>
+                                        <small v-if="paymentForm.card_number && paymentForm.card_number.length === 16" class="text-success d-block mt-1">
+                                            <i class="fas fa-check-circle me-1"></i>Card number format is valid
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Expiry Date (MM/YY) *</label>
+                                            <input v-model="paymentForm.expiry" type="text" class="form-control" placeholder="MM/YY" 
+                                                pattern="(0[1-9]|1[0-2])/[0-9]{2}" title="Expiry date must be in MM/YY format with valid month (01-12)"
+                                                maxlength="5" inputmode="numeric" required autocomplete="cc-exp">
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>MM/YY format, month 01-12 (e.g., 12/26)
+                                            </small>
+                                            <small v-if="paymentForm.expiry && /^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(paymentForm.expiry)" class="text-success d-block mt-1">
+                                                <i class="fas fa-check-circle me-1"></i>Expiry date format is valid
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">CVV *</label>
+                                            <input v-model="paymentForm.cvv" type="password" class="form-control" placeholder="123" 
+                                                pattern="[0-9]{3}" title="CVV must be exactly 3 digits"
+                                                maxlength="3" inputmode="numeric" required autocomplete="cc-csc">
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>3 digits on back of card (e.g., 123)
+                                            </small>
+                                            <small v-if="paymentForm.cvv && paymentForm.cvv.length === 3" class="text-success d-block mt-1">
+                                                <i class="fas fa-check-circle me-1"></i>CVV format is valid
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert alert-info alert-sm">
+                                        <small><i class="fas fa-info-circle me-1"></i><strong>Demo Mode:</strong> This is a dummy payment portal. No actual charges will be made. Use any valid 16-digit card number.</small>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary" :disabled="isLoading">
+                                            {{ isLoading ? 'Processing...' : 'Complete Payment' }}
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" @click="showPaymentModal = false">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Patients Page (Doctor) -->
+                <div v-if="currentPage === 'my-patients' && currentUser.role === 'doctor'">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2><i class="fas fa-users me-2"></i>My Patients</h2>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <div v-if="myPatients.length === 0" class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No patients found. Patients will appear here after their first appointment with you.
+                            </div>
+                            <div v-else class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Patient Name</th>
+                                            <th>Contact</th>
+                                            <th>Gender</th>
+                                            <th>Blood Group</th>
+                                            <th>Total Appointments</th>
+                                            <th>Completed</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="patient in myPatients" :key="patient.id">
+                                            <td><strong>{{ patient.full_name }}</strong></td>
+                                            <td>
+                                                <div>{{ patient.phone }}</div>
+                                                <small class="text-muted">{{ patient.email }}</small>
+                                            </td>
+                                            <td>{{ patient.gender || 'N/A' }}</td>
+                                            <td>{{ patient.blood_group || 'N/A' }}</td>
+                                            <td>
+                                                <span class="badge bg-info">{{ patient.total_appointments }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">{{ patient.completed_appointments }}</span>
+                                            </td>
+                                            <td>
+                                                <button @click="viewPatientHistory(patient)" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-history me-1"></i>View History
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All modal components remain exactly the same -->
+        <!-- Add/Edit Doctor Modal -->
+        <div v-if="showAddDoctorModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ editingDoctor ? 'Edit Doctor' : 'Add Doctor' }}</h5>
+                        <button type="button" class="btn-close" @click="closeModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="saveDoctor">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input v-model="doctorForm.full_name" type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-3" v-if="!editingDoctor">
+                                <label class="form-label">Username</label>
+                                <input v-model="doctorForm.username" type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-3" v-if="!editingDoctor">
+                                <label class="form-label">Password</label>
+                                <input v-model="doctorForm.password" type="password" class="form-control" required placeholder="Enter login password">
+                                <small class="text-muted">Doctor will use this password to login</small>
+                            </div>
+                            <div class="mb-3" v-if="editingDoctor">
+                                <label class="form-label">New Password (optional)</label>
+                                <input v-model="doctorForm.password" type="password" class="form-control" placeholder="Leave blank to keep current password">
+                                <small class="text-muted">Only fill this if you want to change the doctor's password</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input v-model="doctorForm.email" type="email" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input v-model="doctorForm.phone" type="tel" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Gender</label>
+                                <select v-model="doctorForm.gender" class="form-select">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <select v-model="doctorForm.department_id" class="form-select" required>
+                                    <option :value="null" disabled>Select Department</option>
+                                    <option v-for="dept in allDepartments" :key="dept.id" :value="dept.id">{{ dept.name }}</option>
+                                </select>
+                                <small class="text-muted" v-if="allDepartments.length === 0">
+                                    No departments available. Please click "Seed Departments" first.
+                                </small>
+                                <small class="text-muted" v-else>
+                                    {{ allDepartments.length }} departments available
+                                </small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Specialization</label>
+                                <input v-model="doctorForm.specialization" type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Qualification</label>
+                                <input v-model="doctorForm.qualification" type="text" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Experience (years)</label>
+                                <input v-model.number="doctorForm.experience_years" type="number" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Consultation Fee</label>
+                                <input v-model.number="doctorForm.consultation_fee" type="number" step="0.01" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-primary">{{ editingDoctor ? 'Update' : 'Add' }} Doctor</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Modal -->
+        <div v-if="showBookingModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-calendar-plus me-2"></i>Book Appointment - Dr. {{ selectedDoctor.full_name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" @click="showBookingModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="bookAppointment">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-calendar text-primary"></i> Select Date</label>
+                                
+                                <!-- Custom Calendar -->
+                                <div class="custom-calendar mb-3 p-3 border rounded bg-light">
+                                    <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+                                        <button type="button" @click="prevMonth" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <h6 class="mb-0">{{ calendarMonth }}</h6>
+                                        <button type="button" @click="nextMonth" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="calendar-weekdays d-grid gap-1" style="grid-template-columns: repeat(7, 1fr);">
+                                        <div class="weekday-header text-center fw-semibold text-muted" v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day">
+                                            {{ day }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="calendar-dates d-grid gap-1 mt-2" style="grid-template-columns: repeat(7, 1fr);">
+                                        <button v-for="date in calendarDates" 
+                                                :key="date.dateStr"
+                                                type="button"
+                                                @click="selectAppointmentDate(date.dateStr)"
+                                                :class="getDateButtonClass(date)"
+                                                :disabled="date.isDisabled">
+                                            {{ date.day }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Green = Available
+                                    <span class="ms-3"><i class="fas fa-circle text-danger me-2" style="font-size: 0.5rem;"></i>Red = Unavailable</span>
+                                </small>
+                                
+                                <!-- Selected Date Display -->
+                                <div v-if="bookingForm.appointment_date" class="mt-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-check text-success"></i></span>
+                                        <input type="text" class="form-control" :value="bookingForm.appointment_date" disabled>
+                                        <button type="button" @click="bookingForm.appointment_date = ''" class="btn btn-outline-danger">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-clock text-primary"></i> Select Time Slot</label>
+                                <div v-if="loadingSlotsDate === bookingForm.appointment_date" class="alert alert-info">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Loading available slots...</span>
+                                </div>
+                                <div v-else-if="availableSlots && availableSlots.length > 0" class="d-flex flex-wrap gap-2">
+                                    <button v-for="slot in availableSlots" 
+                                            :key="slot" 
+                                            type="button"
+                                            @click="bookingForm.appointment_time = slot"
+                                            :class="['btn', bookingForm.appointment_time === slot ? 'btn-primary' : 'btn-outline-primary']">
+                                        {{ slot }}
+                                    </button>
+                                </div>
+                                <div v-else class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span v-if="bookingForm.appointment_date">No slots available for the selected date. Please choose a different date.</span>
+                                    <span v-else>Please select a date to view available slots.</span>
+                                </div>
+                                <small class="text-muted d-block mt-2">Each slot is for one appointment (30 minutes duration)</small>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-notes-medical text-primary"></i> Reason for Visit</label>
+                                <textarea v-model="bookingForm.reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason for visiting..."></textarea>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between gap-2">
+                                <button type="button" @click="showBookingModal = false" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary" :disabled="!bookingForm.appointment_date || !bookingForm.appointment_time">
+                                    <i class="fas fa-check me-2"></i>Confirm Booking
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Appointment Modal -->
+        <div v-if="showEditAppointmentModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>Edit Appointment - Dr. {{ editingAppointment?.doctor_name }}
+                        </h5>
+                        <button type="button" class="btn-close" @click="showEditAppointmentModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="errorMessage" class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMessage }}
+                        </div>
+                        <form @submit.prevent="updateAppointment">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Current Date & Time</label>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    {{ editingAppointment?.appointment_date }} at {{ editingAppointment?.appointment_time }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-calendar text-primary"></i> Select New Date</label>
+                                
+                                <!-- Custom Calendar for Edit -->
+                                <div class="custom-calendar mb-3 p-3 border rounded bg-light">
+                                    <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+                                        <button type="button" @click="prevEditMonth" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <h6 class="mb-0">{{ editCalendarMonth }}</h6>
+                                        <button type="button" @click="nextEditMonth" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="calendar-weekdays d-grid gap-1" style="grid-template-columns: repeat(7, 1fr);">
+                                        <div class="weekday-header text-center fw-semibold text-muted" v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day">
+                                            {{ day }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="calendar-dates d-grid gap-1 mt-2" style="grid-template-columns: repeat(7, 1fr);">
+                                        <button v-for="date in editCalendarDates" 
+                                                :key="date.dateStr"
+                                                type="button"
+                                                @click="selectEditAppointmentDate(date.dateStr)"
+                                                :class="getEditDateButtonClass(date)"
+                                                :disabled="date.isDisabled">
+                                            {{ date.day }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-circle text-success me-2" style="font-size: 0.5rem;"></i>Green = Available
+                                    <span class="ms-3"><i class="fas fa-circle text-danger me-2" style="font-size: 0.5rem;"></i>Red = Unavailable</span>
+                                </small>
+                                
+                                <!-- Selected Date Display -->
+                                <div v-if="editAppointmentForm.appointment_date" class="mt-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar-check text-success"></i></span>
+                                        <input type="text" class="form-control" :value="editAppointmentForm.appointment_date" disabled>
+                                        <button type="button" @click="editAppointmentForm.appointment_date = ''" class="btn btn-outline-danger">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold"><i class="fas fa-clock text-primary"></i> Select New Time Slot</label>
+                                <div v-if="editAvailableSlots && editAvailableSlots.length > 0" class="d-flex flex-wrap gap-2">
+                                    <button v-for="slot in editAvailableSlots" 
+                                            :key="slot" 
+                                            type="button"
+                                            @click="editAppointmentForm.appointment_time = slot"
+                                            :class="['btn', editAppointmentForm.appointment_time === slot ? 'btn-primary' : 'btn-outline-primary']">
+                                        {{ slot }}
+                                    </button>
+                                </div>
+                                <div v-else class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span v-if="editAppointmentForm.appointment_date">No slots available for the selected date. Please choose a different date.</span>
+                                    <span v-else>Please select a date to view available slots.</span>
+                                </div>
+                                <small class="text-muted d-block mt-2">Each slot is for one appointment (30 minutes duration)</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Reason for Visit</label>
+                                <textarea v-model="editAppointmentForm.reason" class="form-control" rows="3" placeholder="Update reason if needed"></textarea>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" @click="showEditAppointmentModal = false" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-warning" :disabled="isLoading">
+                                    <i class="fas fa-save me-2"></i>{{ isLoading ? 'Updating...' : 'Update Appointment' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Treatment Modal -->
+        <div v-if="showTreatmentModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Complete Appointment</h5>
+                        <button type="button" class="btn-close" @click="showTreatmentModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="saveTreatment">
+                            <div class="mb-3">
+                                <label class="form-label">Diagnosis</label>
+                                <textarea v-model="treatmentForm.diagnosis" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Prescription</label>
+                                <textarea v-model="treatmentForm.prescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea v-model="treatmentForm.notes" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Next Visit Date (Optional)</label>
+                                <input v-model="treatmentForm.next_visit_date" type="date" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-success">Save & Complete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Modal -->
+        <div v-if="showNotificationModal && notifications.length > 0" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="fas fa-bell me-2"></i>Notifications
+                        </h5>
+                        <button type="button" class="btn-close" @click="markAllNotificationsRead"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted">You have {{ notifications.length }} unread notification(s)</p>
+                        <div v-for="notification in notifications" :key="notification.id" class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>{{ notification.message }}</strong>
+                            <button type="button" class="btn-close" @click="markNotificationRead(notification.id)"></button>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button @click="markAllNotificationsRead" class="btn btn-primary">
+                                <i class="fas fa-check-double me-2"></i>Mark All as Read
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient History Modal (Doctor) -->
+        <div v-if="showPatientHistoryModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-history me-2"></i>Patient History - {{ selectedPatient?.full_name }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" @click="showPatientHistoryModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div v-if="patientHistory.length === 0" class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No completed appointments found for this patient.
+                        </div>
+                        <div v-else>
+                            <div v-for="record in patientHistory" :key="record.id" class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ record.appointment_date }}</strong> at {{ record.appointment_time }}
+                                        <span class="badge bg-success ms-2">{{ record.status }}</span>
+                                    </div>
+                                    <button v-if="record.treatment" @click="editTreatment(record)" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit me-1"></i>Update
+                                    </button>
+                                </div>
+                                <div class="card-body" v-if="record.treatment">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Diagnosis:</strong></p>
+                                            <p>{{ record.treatment.diagnosis || 'N/A' }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Prescription:</strong></p>
+                                            <p>{{ record.treatment.prescription || 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Notes:</strong></p>
+                                            <p>{{ record.treatment.notes || 'N/A' }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Next Visit:</strong></p>
+                                            <p>{{ record.treatment.next_visit_date || 'Not scheduled' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Treatment Modal (Doctor) -->
+        <div v-if="showEditTreatmentModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>Update Treatment Record
+                        </h5>
+                        <button type="button" class="btn-close" @click="showEditTreatmentModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="updateTreatmentRecord">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Diagnosis *</label>
+                                <textarea v-model="editTreatmentForm.diagnosis" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Prescription</label>
+                                <textarea v-model="editTreatmentForm.prescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Notes</label>
+                                <textarea v-model="editTreatmentForm.notes" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Next Visit Date</label>
+                                <input v-model="editTreatmentForm.next_visit_date" type="date" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="button" @click="showEditTreatmentModal = false" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-warning" :disabled="isLoading">
+                                    <i class="fas fa-save me-2"></i>{{ isLoading ? 'Updating...' : 'Update Treatment' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors Modal -->
+        <div v-if="showDoctorsModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ selectedDepartment.name }} - Doctors</h5>
+                        <button type="button" class="btn-close" @click="showDoctorsModal = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div v-for="doctor in departmentDoctors" :key="doctor.id" class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Dr. {{ doctor.full_name }}</h6>
+                                        <p class="card-text text-muted small mb-1"><i class="fas fa-stethoscope"></i> {{ doctor.specialization }}</p>
+                                        <p class="text-muted small mb-1"><i class="fas fa-graduation-cap"></i> {{ doctor.qualification }}</p>
+                                        <p class="text-muted small mb-1"><i class="fas fa-briefcase"></i> {{ doctor.experience_years }} years experience</p>
+                                        <p class="mb-2"><strong>Fee:</strong> ${{ doctor.consultation_fee }}</p>
+                                        <div class="d-flex gap-2">
+                                            <button @click="viewDoctorProfile(doctor)" class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-user"></i> Profile
+                                            </button>
+                                            <button @click="selectDoctorForBooking(doctor)" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-calendar-plus"></i> Book
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="departmentDoctors.length === 0" class="text-center text-muted py-4">
+                            No doctors found
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Doctor Profile Modal -->
+        <div v-if="showDoctorProfileModal" class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="fas fa-user-md"></i> Doctor Profile</h5>
+                        <button type="button" class="btn-close btn-close-white" @click="showDoctorProfileModal = false"></button>
+                    </div>
+                    <div class="modal-body" v-if="selectedDoctor">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Dr. {{ selectedDoctor.full_name }}</h4>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-hospital text-primary"></i> Department:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.department_name }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-stethoscope text-primary"></i> Specialization:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.specialization }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-graduation-cap text-primary"></i> Qualification:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.qualification }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-briefcase text-primary"></i> Experience:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.experience_years }} years</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-venus-mars text-primary"></i> Gender:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.gender || 'Not specified' }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-phone text-primary"></i> Phone:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.phone }}</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong><i class="fas fa-envelope text-primary"></i> Email:</strong>
+                                            <span class="ms-2">{{ selectedDoctor.email }}</span>
+                                        </div>
+                                        <div class="mb-3 card bg-light">
+                                            <div class="card-body text-center p-3">
+                                                <h6 class="text-primary">Consultation Fee</h6>
+                                                <h3 class="text-success mb-0">${{ selectedDoctor.consultation_fee }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showDoctorProfileModal = false">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                        <button type="button" class="btn btn-primary" @click="selectDoctorForBooking(selectedDoctor); showDoctorProfileModal = false">
+                            <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                        
+                        // Check for updates periodically
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000); // Check every minute
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+            
+            // Prompt user to install app when install event is ready
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                // Show install button/notification to user
+                const installButton = document.createElement('button');
+                installButton.id = 'install-button';
+                installButton.innerHTML = '<i class="fas fa-download me-2"></i>Install App';
+                installButton.className = 'btn btn-sm btn-info position-fixed bottom-3 end-3';
+                installButton.style.zIndex = '9999';
+                
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response to the install prompt: ${outcome}`);
+                        deferredPrompt = null;
+                        installButton.remove();
+                    }
+                });
+                
+                // Only show button if user is logged in (check for access token)
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (localStorage.getItem('access_token')) {
+                        if (!document.getElementById('install-button')) {
+                            document.body.appendChild(installButton);
+                        }
+                    }
+                });
+            });
+            
+            window.addEventListener('appinstalled', () => {
+                console.log('HMS App was installed');
+                const button = document.getElementById('install-button');
+                if (button) button.remove();
+            });
+        }
+        
+        // Notification permission request
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+        
+        // Show notification example
+        function showNotification(title, options = {}) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%232c3e50" width="192" height="192"/><text x="96" y="120" font-size="80" font-weight="bold" fill="%23fff" text-anchor="middle" font-family="Arial">HMS</text><path fill="%23f39c12" d="M96 20 L140 50 L140 100 Q96 130 52 100 L52 50 Z"/></svg>',
+                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect fill="%232c3e50" width="96" height="96"/><text x="48" y="72" font-size="60" font-weight="bold" fill="%23fff" text-anchor="middle" font-family="Arial">H</text></svg>',
+                    ...options
+                });
+            }
+        }
+        
+        // Share API support (if available)
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Hospital Management System',
+                    text: 'Check out this amazing hospital management app!',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                alert('Share feature not supported on your device');
+            }
+        }
+    </script>
+    
+    <!-- Responsive Design Optimization Script -->
+    <script>
+        // Optimize layout for different screen sizes
+        function optimizeForMobile() {
+            const isMobile = window.innerWidth < 768;
+            const navbar = document.querySelector('.navbar');
+            const container = document.querySelector('.container, .container-fluid');
+            
+            if (isMobile && navbar) {
+                navbar.classList.add('navbar-sm');
+            }
+        }
+        
+        window.addEventListener('resize', optimizeForMobile);
+        window.addEventListener('load', optimizeForMobile);
+        
+        // Add scroll behavior for mobile
+        document.addEventListener('touchmove', function(e) {
+            const modals = document.querySelectorAll('.modal.show');
+            if (modals.length > 0) {
+                // Prevent background scroll when modal is open
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>

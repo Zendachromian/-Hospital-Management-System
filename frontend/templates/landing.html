@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS - Hospital Management System | Professional Healthcare Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/landing.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+</head>
+<body class="landing-page">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light landing-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-hospital"></i>
+                <span>Hospital Management System</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#team">Team</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="nav-link btn btn-primary px-4" href="/app">Sign In</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Shape -->
+    <section class="section-shaped section-hero" id="home">
+        <div class="shape shape-default"></div>
+        <div class="container pt-md-5 pt-5">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6">
+                    <h1 class="display-3 mb-4" style="font-weight: 900; color: #ffffff;">
+                        Modern Healthcare Management
+                    </h1>
+                    <p class="lead mb-4" style="color: rgba(255, 255, 255, 0.9); font-size: 1.25rem;">
+                        Streamline your hospital operations with our comprehensive management system. Manage doctors, patients, appointments, and treatments efficiently in one platform.
+                    </p>
+                    <div class="btn-group-wrap">
+                        <a href="/app" class="btn btn-light btn-lg me-3 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg mb-3">
+                            <i class="fas fa-arrow-down me-2"></i>Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <div class="icon-box">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section section-features py-5" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 mb-3" style="font-weight: 800;">
+                    Powerful Features
+                </h2>
+                <p class="lead text-muted">
+                    Everything you need to manage modern healthcare facilities
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Feature 1 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <h5>Admin Dashboard</h5>
+                        <p>Comprehensive system overview with real-time statistics, user management, and complete control over the platform.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-doctor"></i>
+                        </div>
+                        <h5>Doctor Management</h5>
+                        <p>Manage doctor profiles, specialties, availability schedules, and track their appointments and patient interactions.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-injured"></i>
+                        </div>
+                        <h5>Patient Portal</h5>
+                        <p>Patients can easily book appointments, view their treatment history, and communicate with healthcare providers.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h5>Appointment System</h5>
+                        <p>Smart appointment scheduling with automatic reminders, cancellation management, and calendar synchronization.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h5>Treatment Records</h5>
+                        <p>Complete digital treatment documentation with diagnosis, prescriptions, and patient progress tracking.</p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5>Analytics & Reports</h5>
+                        <p>Advanced charts and analytics for performance metrics, patient statistics, and system-wide insights.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section with Shape -->
+    <section class="section-shaped section-services" id="services">
+        <div class="shape shape-default"></div>
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-6 order-lg-2">
+                    <div class="service-image">
+                        <div class="service-icon-large">
+                            <i class="fas fa-laptop-medical"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <h2 class="display-4 mb-4" style="font-weight: 800; color: #ffffff;">
+                        Services We Provide
+                    </h2>
+                    <div class="service-list">
+                        <div class="service-item">
+                            <div class="service-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6>24/7 System Availability</h6>
+                                <p>Cloud-based platform accessible anytime, anywhere</p>
+                            </div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6>Secure Data Management</h6>
+                                <p>Enterprise-grade security for patient privacy protection</p>
+                            </div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6>Real-time Notifications</h6>
+                                <p>Instant alerts for appointments, treatments, and updates</p>
+                            </div>
+                        </div>
+                        <div class="service-item">
+                            <div class="service-check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h6>Export & Reporting</h6>
+                                <p>Generate comprehensive reports in multiple formats</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="section section-stats py-5 bg-light">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <h3 class="display-5" style="font-weight: 900; color: #06b6d4;">500+</h3>
+                        <p class="text-muted">Hospitals Using</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <h3 class="display-5" style="font-weight: 900; color: #10b981;">50K+</h3>
+                        <p class="text-muted">Active Users</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <h3 class="display-5" style="font-weight: 900; color: #f59e0b;">1M+</h3>
+                        <p class="text-muted">Appointments Managed</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-item">
+                        <h3 class="display-5" style="font-weight: 900; color: #ef4444;">99.9%</h3>
+                        <p class="text-muted">Uptime Guarantee</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section section-team py-5" id="team">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 mb-3" style="font-weight: 800;">
+                    Our Team
+                </h2>
+                <p class="lead text-muted">
+                    Expert professionals dedicated to healthcare excellence
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5>Dr. Sarah Johnson</h5>
+                        <p class="text-muted">Chief Medical Officer</p>
+                        <p>20+ years of healthcare management experience</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5>Dr. Michael Chen</h5>
+                        <p class="text-muted">Technical Director</p>
+                        <p>Cloud infrastructure and system design specialist</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h5>Dr. Emily Rodriguez</h5>
+                        <p class="text-muted">Operations Manager</p>
+                        <p>Patient care and operational excellence expert</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section with Shape -->
+    <section class="section-shaped section-cta">
+        <div class="shape shape-default"></div>
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="display-4 mb-3" style="font-weight: 800; color: #ffffff;">
+                        Ready to Transform Your Hospital Operations?
+                    </h2>
+                    <p class="lead mb-0" style="color: rgba(255, 255, 255, 0.9);">
+                        Join hundreds of hospitals already using HMS to streamline their operations and improve patient care.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="/app" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-rocket me-2"></i>Get Started Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer pt-5 pb-4 bg-dark text-white">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-4">
+                    <h6 class="mb-3">
+                        <i class="fas fa-hospital me-2"></i>HMS Platform
+                    </h6>
+                    <p class="text-muted">
+                        Professional Hospital Management System designed for modern healthcare facilities worldwide.
+                    </p>
+                </div>
+                <div class="col-lg-2 mb-4">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled text-muted small">
+                        <li><a href="#features" class="text-decoration-none">Features</a></li>
+                        <li><a href="#services" class="text-decoration-none">Services</a></li>
+                        <li><a href="#team" class="text-decoration-none">Team</a></li>
+                        <li><a href="/app" class="text-decoration-none">Sign In</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 mb-4">
+                    <h6 class="mb-3">Resources</h6>
+                    <ul class="list-unstyled text-muted small">
+                        <li><a href="#" class="text-decoration-none">Documentation</a></li>
+                        <li><a href="#" class="text-decoration-none">Tutorials</a></li>
+                        <li><a href="#" class="text-decoration-none">Support</a></li>
+                        <li><a href="#" class="text-decoration-none">API</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h6 class="mb-3">Follow Us</h6>
+                    <div class="social-links">
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted small mb-0">
+                        © 2026 Hospital Management System. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted small mb-0">
+                        <a href="#" class="text-decoration-none text-muted">Privacy Policy</a> • 
+                        <a href="#" class="text-decoration-none text-muted">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    // Update active nav
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.landing-navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+        });
+
+        // Clear old service worker cache to ensure landing page is fresh
+        if ('caches' in window) {
+            caches.keys().then(cacheNames => {
+                cacheNames.forEach(cacheName => {
+                    // Clear all caches related to static/dynamic content
+                    if (cacheName.includes('hms') || cacheName.includes('static') || cacheName.includes('dynamic')) {
+                        caches.delete(cacheName).then(() => {
+                            console.log('Cleared cache:', cacheName);
+                        });
+                    }
+                });
+            });
+        }
+
+        // Unregister all service workers to ensure fresh landing page
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(registration => {
+                    registration.unregister().then(() => {
+                        console.log('Service Worker unregistered');
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
